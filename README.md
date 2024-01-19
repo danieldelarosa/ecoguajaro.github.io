@@ -1,4 +1,7 @@
 # ECOGUAJARO
 Diseño e implementación de un prototipo para prevención de inundaciones en la Ciénaga De Guájaro - ECOGUAJARO
-![Vista_ECOGUAJARO](https://i.imgur.com/E7T7552.png)
-![Animacion_ECOGUAJARO](https://media.giphy.com/media/vFKqnCdLPNOKc/giphy.gif)
+![ecoguajaro](https://github.com/danieldelarosa/ecoguajaro.github.io/assets/5619520/bb47d016-3da1-44e0-b8cc-1a7da82bcad8)
+<br>
+![firefox_Nex1hHvFp3](https://github.com/danieldelarosa/ecoguajaro.github.io/assets/5619520/3a3f2406-4f98-4669-898f-6e104e29848e)
+
+
