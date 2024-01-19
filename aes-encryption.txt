@@ -1,0 +1,672 @@
+[
+    {
+        "id": "3f867722d3d28a29",
+        "type": "tab",
+        "label": "aes encrypt",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "fe58d8cad43c8ded",
+        "type": "function",
+        "z": "3f867722d3d28a29",
+        "name": "decrypt",
+        "func": "//const iv =\"BBBBBBBBBBBBBBBB\";\nconst key=\"ZZZZZZZZZZZZZZZZZZZZZZZZzzzzzzzz\";\nconst algorithm = 'aes-256-ctr';\n//const ENCRYPTION_KEY = 'password'; // or generate sample key Buffer.from('FoCKvdLslUuB4y3EZlKate7XGottHski1LmyqJHvUhs=', 'base64');\nconst IV_LENGTH = 16;\n//let iv = crypto.randomBytes(IV_LENGTH);\n//let cipher = crypto.createCipheriv(algorithm, Buffer.from(ENCRYPTION_KEY, 'hex'), iv);\n\n\nfunction decrypt(text) {\n    let textParts = text.split(':');\n    node.log(textParts[0]);\n    let iv = Buffer.from(textParts[0], 'hex');\n    node.log(\"iv =\"+iv);\n\n    let encryptedText = Buffer.from(textParts[1], 'hex');\n    let decipher = crypto.createDecipheriv(algorithm,key, iv);\n    let decrypted = decipher.update(encryptedText);\n    decrypted = Buffer.concat([decrypted, decipher.final()]);\n    return decrypted.toString();\n}\n\n\n\nmsg.payload=decrypt(msg.payload);\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "crypto",
+                "module": "crypto"
+            }
+        ],
+        "x": 460,
+        "y": 1260,
+        "wires": [
+            [
+                "4c0e3e54ce612797"
+            ]
+        ]
+    },
+    {
+        "id": "392f451c96d6b38a",
+        "type": "mqtt in",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "topic": "house/switch1",
+        "qos": "0",
+        "datatype": "buffer",
+        "broker": "c67ad5d08b707041",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 110,
+        "y": 100,
+        "wires": [
+            [
+                "f8968db409444114",
+                "8620ea59244c7db5"
+            ]
+        ]
+    },
+    {
+        "id": "119e73a7fda5aaa7",
+        "type": "debug",
+        "z": "3f867722d3d28a29",
+        "name": "result",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "63c0c59deea78b29",
+        "type": "function",
+        "z": "3f867722d3d28a29",
+        "name": "Key and IV",
+        "func": "let payload={};\npayload.key=\"ZZZZZZZZZZZZZZZZZZZZZZZZzzzzzzzz\";\npayload.initVector=\"BBBBBBBBBBBBBBBB\";\n\npayload.data=Buffer.from(msg.payload);\nmsg.payload=payload;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 380,
+        "wires": [
+            [
+                "555a2ad65878e0b1",
+                "560ad3a18c3895eb"
+            ]
+        ]
+    },
+    {
+        "id": "f8968db409444114",
+        "type": "decrypt",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "algorithm": "AES",
+        "key": "password",
+        "x": 280,
+        "y": 160,
+        "wires": [
+            [
+                "119e73a7fda5aaa7"
+            ]
+        ]
+    },
+    {
+        "id": "6f2a7aa474330254",
+        "type": "encrypt",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "algorithm": "AES",
+        "key": "password",
+        "x": 300,
+        "y": 260,
+        "wires": [
+            [
+                "4cd74f6f25d32389",
+                "c4532efc7895fe8b"
+            ]
+        ]
+    },
+    {
+        "id": "4cd74f6f25d32389",
+        "type": "debug",
+        "z": "3f867722d3d28a29",
+        "name": "out",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 490,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "a56e4bf9a41c606b",
+        "type": "inject",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "my message",
+        "payloadType": "str",
+        "x": 110,
+        "y": 220,
+        "wires": [
+            [
+                "6f2a7aa474330254"
+            ]
+        ]
+    },
+    {
+        "id": "c4532efc7895fe8b",
+        "type": "mqtt out",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "topic": "house/switch1",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "c67ad5d08b707041",
+        "x": 500,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "8620ea59244c7db5",
+        "type": "debug",
+        "z": "3f867722d3d28a29",
+        "name": "mqtt",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 450,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "555a2ad65878e0b1",
+        "type": "aes-encrypt",
+        "z": "3f867722d3d28a29",
+        "name": "aes encrypt",
+        "x": 550,
+        "y": 460,
+        "wires": [
+            [
+                "d62d5a217648cc34",
+                "560ad3a18c3895eb"
+            ]
+        ]
+    },
+    {
+        "id": "da954510b680b3dc",
+        "type": "aes-decrypt",
+        "z": "3f867722d3d28a29",
+        "name": "aes decrypt",
+        "x": 590,
+        "y": 640,
+        "wires": [
+            [
+                "e3d449e4b7a41922",
+                "bc2eabe071827c2b"
+            ]
+        ]
+    },
+    {
+        "id": "d3cf6aac8b065c98",
+        "type": "inject",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "this is a test messsage",
+        "payloadType": "str",
+        "x": 220,
+        "y": 440,
+        "wires": [
+            [
+                "63c0c59deea78b29"
+            ]
+        ]
+    },
+    {
+        "id": "23d7a4054353e6ae",
+        "type": "mqtt in",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "topic": "house/switch2",
+        "qos": "0",
+        "datatype": "utf8",
+        "broker": "c67ad5d08b707041",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 170,
+        "y": 600,
+        "wires": [
+            [
+                "77dc3d64b4dcfc59"
+            ]
+        ]
+    },
+    {
+        "id": "5b11537cf9eec343",
+        "type": "function",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "func": "let data={};\nmsg.key=\"ZZZZZZZZZZZZZZZZZZZZZZZZzzzzzzzz\";\n//data.initVector=\"BBBBBBBBBBBBBBBB\";\n//data.data=\"this is a test messsafe\";\n//msg.payload=data;\nmsg.payload={\"key\":\"ZZZZZZZZZZZZZZZZZZZZZZZZzzzzzzzz\",\"data\":msg.payload.encryptedData,\"initVector\":msg.payload.initVector};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 900,
+        "y": 980,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e3d449e4b7a41922",
+        "type": "debug",
+        "z": "3f867722d3d28a29",
+        "name": "test",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 850,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "5fe6e00f60bb2604",
+        "type": "debug",
+        "z": "3f867722d3d28a29",
+        "name": "in",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 390,
+        "y": 1320,
+        "wires": []
+    },
+    {
+        "id": "560ad3a18c3895eb",
+        "type": "debug",
+        "z": "3f867722d3d28a29",
+        "name": "out",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 850,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "b501316790a0f15f",
+        "type": "function",
+        "z": "3f867722d3d28a29",
+        "name": "base64",
+        "func": "let buff=Buffer.from(\"test message\");\nlet base64data = buff.toString('base64'); //encode\n\nlet data =base64data ;\nbuff = new Buffer(data, 'base64');\nlet text = buff.toString('ascii');\nmsg.payload=text;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 1420,
+        "wires": [
+            [
+                "4c0e3e54ce612797"
+            ]
+        ]
+    },
+    {
+        "id": "e1fa15f17cfeeca3",
+        "type": "inject",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 1400,
+        "wires": [
+            [
+                "b501316790a0f15f"
+            ]
+        ]
+    },
+    {
+        "id": "4c0e3e54ce612797",
+        "type": "debug",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 1400,
+        "wires": []
+    },
+    {
+        "id": "d62d5a217648cc34",
+        "type": "function",
+        "z": "3f867722d3d28a29",
+        "name": "Turn to JSON",
+        "func": "let payload=msg.payload;\n\nlet data =(payload.encryptedData).toString('base64');\nlet initVector= (payload.initVector).toString('base64');\npayload={\"data\":data,\"initVector\":initVector};\nmsg.payload=JSON.stringify(payload);\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 540,
+        "wires": [
+            [
+                "560ad3a18c3895eb",
+                "2254f0ef80e091f2"
+            ]
+        ]
+    },
+    {
+        "id": "77dc3d64b4dcfc59",
+        "type": "function",
+        "z": "3f867722d3d28a29",
+        "name": "un pack JSON data",
+        "func": "\nlet key=\"ZZZZZZZZZZZZZZZZZZZZZZZZzzzzzzzz\";\nlet payload=JSON.parse(msg.payload)\nlet data = new Buffer(payload.data, 'base64');\nnode.log(\"buffer length =\"+data.length);\n//let data = buff.toString('ascii');\nlet initVector = new Buffer(payload.initVector, 'base64');\n//let initVector = buff.toString('ascii');\n//msg.payload=data;\nmsg.payload={\"key\":key,\"data\":data,\"initVector\":initVector};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 560,
+        "wires": [
+            [
+                "da954510b680b3dc",
+                "f7d53a721f2ca142"
+            ]
+        ]
+    },
+    {
+        "id": "f7d53a721f2ca142",
+        "type": "debug",
+        "z": "3f867722d3d28a29",
+        "name": "dec",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "bb90521364c78587",
+        "type": "mqtt in",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "topic": "house/switch3",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "c67ad5d08b707041",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 150,
+        "y": 1260,
+        "wires": [
+            [
+                "fe58d8cad43c8ded",
+                "5fe6e00f60bb2604"
+            ]
+        ]
+    },
+    {
+        "id": "a8372b1a2f8e4d49",
+        "type": "debug",
+        "z": "3f867722d3d28a29",
+        "name": "out",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 570,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "4c220db1fca7baa0",
+        "type": "function",
+        "z": "3f867722d3d28a29",
+        "name": "encrypt message",
+        "func": "//const iv =\"BBBBBBBBBBBBBBBB\";\nconst key=\"ZZZZZZZZZZZZZZZZZZZZZZZZzzzzzzzz\";\nconst algorithm = 'aes-256-ctr';\n//const ENCRYPTION_KEY = 'password'; // or generate sample key Buffer.from('FoCKvdLslUuB4y3EZlKate7XGottHski1LmyqJHvUhs=', 'base64');\nconst IV_LENGTH = 16;\nlet iv = crypto.randomBytes(IV_LENGTH);\n//let cipher = crypto.createCipheriv(algorithm, Buffer.from(ENCRYPTION_KEY, 'hex'), iv);\nfunction encrypt(text) {\n\n    let cipher = crypto.createCipheriv(algorithm, key, iv);\n    let encrypted = cipher.update(text);\n    encrypted = Buffer.concat([encrypted, cipher.final()]);\n\n  // This returns a string\n    return iv.toString('hex') + ':' + encrypted.toString('hex');\n// This returns a Json object\n//let temp={\"iv\":iv.toString('hex'),\"data\":encrypted.toString('hex')};\n    \n}\n\nmsg.payload=encrypt(msg.payload);\n//let m_out=encrypt(msg.payload);\n//msg.payload = JSON.stringify(m_out);\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [
+            {
+                "var": "crypto",
+                "module": "crypto"
+            }
+        ],
+        "x": 350,
+        "y": 1120,
+        "wires": [
+            [
+                "6059e3114e8953ab",
+                "a8372b1a2f8e4d49"
+            ]
+        ]
+    },
+    {
+        "id": "bc2eabe071827c2b",
+        "type": "function",
+        "z": "3f867722d3d28a29",
+        "name": "convert buffer to string",
+        "func": "let buff=msg.payload;\nmsg.payload=buff.toString(\"utf8\");\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 840,
+        "y": 640,
+        "wires": [
+            [
+                "e3d449e4b7a41922"
+            ]
+        ]
+    },
+    {
+        "id": "2254f0ef80e091f2",
+        "type": "mqtt out",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "topic": "house/switch2",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "c67ad5d08b707041",
+        "x": 940,
+        "y": 560,
+        "wires": []
+    },
+    {
+        "id": "c98fc90b7f27041a",
+        "type": "function",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "func": "\nfunction encrypt(text) {\n let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(key), iv);\n let encrypted = cipher.update(text);\n encrypted = Buffer.concat([encrypted, cipher.final()]);\n return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 1220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b149e7d10f1b1623",
+        "type": "comment",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "info": "https://melvingeorge.me/blog/encrypt-decrypt-message-nodejs\nhttps://stackoverflow.com/questions/6953286/how-to-encrypt-data-that-needs-to-be-decrypted-in-node-js\nhttps://fireship.io/lessons/node-crypto-examples/\nhttps://codeforgeek.com/encrypt-and-decrypt-data-in-node-js/\nhttps://www.section.io/engineering-education/data-encryption-and-decryption-in-node-js-using-crypto/\nhttps://blog.boot.dev/cryptography/aes-256-cipher/",
+        "x": 520,
+        "y": 900,
+        "wires": []
+    },
+    {
+        "id": "a6c8a4e2dd52b25b",
+        "type": "inject",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "test message",
+        "payloadType": "str",
+        "x": 120,
+        "y": 1140,
+        "wires": [
+            [
+                "4c220db1fca7baa0"
+            ]
+        ]
+    },
+    {
+        "id": "6059e3114e8953ab",
+        "type": "mqtt out",
+        "z": "3f867722d3d28a29",
+        "name": "",
+        "topic": "house/switch3",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "c67ad5d08b707041",
+        "x": 800,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "c67ad5d08b707041",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    }
+]
